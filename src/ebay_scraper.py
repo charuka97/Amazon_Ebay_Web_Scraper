@@ -36,9 +36,16 @@ def parse_ebay_product_page(soup):
         )
 
         # Get product image
-        image_element = container.find("img", class_="s-item__image-img")
-        product["image"] = image_element["src"] if image_element else "Not available"
-
+        # image_element = container.find("img", class_="s-item__image-img")
+        # product["image"] = image_element["src"] if image_element else "Not available"
+        
+        image_grid_container = soup.find("div", class_="ux-image-grid-container")
+        image_links = []
+        if image_grid_container:
+            img_elements = image_grid_container.select(".ux-image-grid-item img")
+            image_links = [img["src"] for img in img_elements if "src" in img.attrs]
+        product["images"] = image_links
+        
         # Get product category
         category_element = soup.find("h1", class_="srp-controls__count-heading")
         product["category"] = (

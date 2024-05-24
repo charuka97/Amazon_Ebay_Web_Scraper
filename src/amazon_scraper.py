@@ -1,7 +1,7 @@
 import src.utils as utils
 from src.database import MongoDB, get_config
 import random
-
+import re
 config = get_config()
 
 
@@ -35,7 +35,7 @@ def parse_amazon_product_page(soup):
             review_count_element.text.strip() if review_count_element else "0 reviews"
         )
 
-        # Get product image
+        # Get product images
         image_elements = container.find_all("img", class_="s-image")
         product["images"] = (
             [img["src"] for img in image_elements]
@@ -62,9 +62,9 @@ def scrape_amazon_category(category_url):
     base_url = config["amazon"]["base_url"]
     auth_content = config["amazon"]["auth_content"]
 
-    headers = config["amazon"]["headers"]
     user_agent = config["amazon"]["User_Agents"]
-
+    headers = config["amazon"]["headers"]
+    
     auth_content["User-Agent"] = random.choice(user_agent)
     auth_content.update(headers)
 
