@@ -19,3 +19,5 @@ This project includes a Python-based web scraper that collects detailed product 
    ```sh
    python3 -m venv scraper_env
    source scraper_env/bin/activate  # On Windows use `scraper_env\Scripts\activate`
+
+to see source code (ctrl + u)

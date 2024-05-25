@@ -2,24 +2,13 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import random
-import yaml
+from src.database import get_config
 import logging
 
-# USER_AGENTS = [
-#     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
-#     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/602.3.12 (KHTML, like Gecko) Version/10.1.2 Safari/602.3.12",
-# ]
-
-# HEADERS = {
-#     "Accept-Encoding": "gzip, deflate",
-#     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-#     "DNT": "1",
-#     "Connection": "close",
-#     "Upgrade-Insecure-Requests": "1",
-# }
+config = get_config()
 
 
-def fetch_page(url, auth_content, retries=1, backoff_factor=0.3):
+def fetch_page(url, auth_content, retries=5, backoff_factor=0.3):
 
     for attempt in range(retries):
         try:
@@ -39,18 +28,35 @@ def fetch_page(url, auth_content, retries=1, backoff_factor=0.3):
                 return None
 
 
-def handle_pagination(soup, base_url, auth_content, parse_function):
-
+def handle_pagination(soup, base_url, auth_content, parse_function, category='Unkonwn'):
     product_data = []
+    next_url = ""
+    page_number = 1
 
     while True:
-
         product_data.extend(parse_function(soup))
-        next_page = soup.find("a", class_="s-pagination-next")
 
-        if not next_page or "disabled" in next_page.get("class", []):
-            break
-        next_url = f"{base_url}{next_page['href']}"
+        # Make next page for pagination
+        if base_url == config["ebay"]["base_url"]:
+            current_page_element = soup.find("a", class_="pagination__item")
+
+            if current_page_element:
+                next_url = f"{base_url}/{category}?rt=nc&_pgn={page_number}"
+                page_number += 1
+            else:
+                break
+
+        elif base_url == config["amazon"]["base_url"]:
+            next_page_element = soup.find("a", class_="s-pagination-next")
+            if next_page_element and "disabled" not in next_page_element.get("class", []):
+                next_url = f"{base_url}{next_page_element['href']}"
+            else:
+                break  # No next page found or it is disabled, end pagination
+
+        else:
+            break  # Unsupported base_url
+
+        print(f"Next URL: {next_url}")
         soup = fetch_page(next_url, auth_content)
 
         if soup is None:
