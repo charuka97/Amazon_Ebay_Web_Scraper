@@ -15,13 +15,13 @@ amazon:
     - "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/602.3.12 (KHTML, like Gecko) Version/10.1.2 Safari/602.3.12"
 
   categories:
-     - "electronics"
-    # - "books"
-    # - "computers"
-    # - "Girls' Fashion"
-    # - "boys' fashion"
-    # - "pet-supplies"
-    # - "DigitalMusic"
+     - "Electronics"
+     - "Books"
+     - "Computers"
+     - "Girls' Fashion"
+     - "Boys' Fashion"
+     - "Pet Supplies"
+     - "Digital Music"
 ebay:
   base_url: "https://www.ebay.com/b"
   auth_content:
