@@ -7,7 +7,8 @@ import logging
 
 config = get_config()
 
-
+# The backoff_factor in fetch_page increases the delay after each failed attempt, 
+# which is especially useful for handling rate limiting.
 def fetch_page(url, auth_content, retries=5, backoff_factor=0.3):
 
     for attempt in range(retries):
@@ -29,11 +30,15 @@ def fetch_page(url, auth_content, retries=5, backoff_factor=0.3):
 
 
 def handle_pagination(soup, base_url, auth_content, parse_function, category='Unkonwn'):
+    
+    # product_data for store the data of all products scraped across multiple pages.
     product_data = []
     next_url = ""
     page_number = 1
 
     while True:
+        # Passed soup to the scrapper function to scrape data of 
+        # current page and then adedd to the product_data list until pagination end
         product_data.extend(parse_function(soup))
 
         # Make next page for pagination
@@ -48,6 +53,9 @@ def handle_pagination(soup, base_url, auth_content, parse_function, category='Un
 
         elif base_url == config["amazon"]["base_url"]:
             next_page_element = soup.find("a", class_="s-pagination-next")
+            
+            # Checks if the next page element is found and is not disabled. If both conditions are true, 
+            # it indicates that there is another page to scrape.
             if next_page_element and "disabled" not in next_page_element.get("class", []):
                 next_url = f"{base_url}{next_page_element['href']}"
             else:
@@ -57,12 +65,15 @@ def handle_pagination(soup, base_url, auth_content, parse_function, category='Un
             break  # Unsupported base_url
 
         print(f"Next URL: {next_url}")
+        
+        # Fetches the next page using the fetch_page function and updates the soup object with the new page's content.
         soup = fetch_page(next_url, auth_content)
 
         if soup is None:
             break
-        time.sleep(random.uniform(1, 3))
+        time.sleep(random.uniform(1, 3)) # Random delay between requests
 
+    # Returns the list of all product data collected from all the pages.
     return product_data
 
 

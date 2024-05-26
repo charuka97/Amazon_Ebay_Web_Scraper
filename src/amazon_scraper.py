@@ -1,10 +1,8 @@
 import src.utils as utils
 from src.database import MongoDB, get_config
 import random
-import re
 
 config = get_config()
-
 
 def parse_amazon_product_page(soup, productCategory):
 

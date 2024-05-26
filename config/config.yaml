@@ -18,10 +18,7 @@ amazon:
      - "Electronics"
      - "Books"
      - "Computers"
-     - "Girls' Fashion"
      - "Boys' Fashion"
-     - "Pet Supplies"
-     - "Digital Music"
 ebay:
   base_url: "https://www.ebay.com/b"
   auth_content:
